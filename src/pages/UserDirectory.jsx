@@ -1,71 +1,220 @@
-import { useMemo, useState } from 'react';
-import AlertBanner from '../components/AlertBanner';
-import SkeletonLoader from '../components/SkeletonLoader';
-import UserCard from '../components/UserCard';
-import useDebounce from '../hooks/useDebounce';
-import useFetch from '../hooks/useFetch';
-import { getUsers } from '../services/postService';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-export default function UserDirectory() {
-  const { data: users, loading, error, reload } = useFetch(getUsers, []);
-  const [query, setQuery] = useState('');
-  const debounced = useDebounce(query, 250);
+const UserDirectory = () => {
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const filtered = useMemo(() => {
-    const q = debounced.trim().toLowerCase();
-    if (!users) return [];
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) || u.company?.name.toLowerCase().includes(q)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+
+        setUsers(response.data);
+      } catch (err) {
+        setError("Unable to load developers. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    const keyword = search.toLowerCase().trim();
+
+    if (!keyword) {
+      return users;
+    }
+
+    return users.filter((user) => {
+      return (
+        user.name.toLowerCase().includes(keyword) ||
+        user.username.toLowerCase().includes(keyword) ||
+        user.email.toLowerCase().includes(keyword) ||
+        user.company?.name?.toLowerCase().includes(keyword)
+      );
+    });
+  }, [users, search]);
+
+  if (loading) {
+    return (
+      <div className="directory-state">
+        <div className="directory-loader"></div>
+
+        <h3>Finding developers...</h3>
+
+        <p>Loading the DevSphere community.</p>
+      </div>
     );
-  }, [users, debounced]);
+  }
+
+  if (error) {
+    return (
+      <div className="directory-state error-state">
+        <div className="error-icon">!</div>
+
+        <h3>Something went wrong</h3>
+
+        <p>{error}</p>
+
+        <button
+          className="primary-btn"
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="page-head">
+    <div className="directory-page">
+      <section className="directory-header">
         <div>
-          <h1>Developer Directory</h1>
-          <p className="muted">Search your engineering org by name or company.</p>
+          <span className="section-label">
+            DEVELOPER DIRECTORY
+          </span>
+
+          <h1>
+            Meet the{" "}
+            <span className="hero-gradient">
+              developers.
+            </span>
+          </h1>
+
+          <p>
+            Explore developers, discover their profiles and learn
+            more about their technical interests.
+          </p>
         </div>
-        {users && <span className="chip">{filtered.length} / {users.length} developers</span>}
-      </div>
 
-      <div className="search-box">
-        <span aria-hidden="true">🔎</span>
-        <input
-          type="search"
-          placeholder='Try "Leanne" or "Romaguera"…'
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search developers"
-        />
-        {query && (
-          <button className="alert-close" onClick={() => setQuery('')} aria-label="Clear search">
-            ✕
-          </button>
-        )}
-      </div>
-
-      {error && <AlertBanner message={error} onRetry={reload} />}
-      {loading && <SkeletonLoader variant="card" count={6} />}
-
-      {!loading && !error && filtered.length > 0 && (
-        <div className="user-grid">
-          {filtered.map((u) => (
-            <UserCard key={u.id} user={u} />
-          ))}
+        <div className="developer-count">
+          <strong>{users.length}</strong>
+          <span>Developers</span>
         </div>
-      )}
+      </section>
 
-      {!loading && !error && filtered.length === 0 && (
-        <div className="card empty-state">
-          <span>🕵️</span>
+      <section className="directory-toolbar">
+        <div className="search-wrapper">
+          <span className="search-icon">⌕</span>
+
+          <input
+            type="text"
+            placeholder="Search by name, username, email or company..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+
+          {search && (
+            <button
+              type="button"
+              className="clear-search"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <div className="result-count">
+          {filteredUsers.length} result
+          {filteredUsers.length !== 1 ? "s" : ""}
+        </div>
+      </section>
+
+      {filteredUsers.length > 0 ? (
+        <section className="developer-grid">
+          {filteredUsers.map((user) => {
+            const initials = user.name
+              .split(" ")
+              .map((name) => name[0])
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+
+            return (
+              <article
+                className="developer-card"
+                key={user.id}
+              >
+                <div className="developer-card-top">
+                  <div className="developer-avatar">
+                    {initials}
+                  </div>
+
+                  <span className="online-dot"></span>
+                </div>
+
+                <div className="developer-info">
+                  <h3>{user.name}</h3>
+
+                  <span className="developer-username">
+                    @{user.username}
+                  </span>
+
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="developer-email"
+                  >
+                    {user.email}
+                  </a>
+                </div>
+
+                <div className="developer-company">
+                  <span className="company-label">
+                    COMPANY
+                  </span>
+
+                  <strong>
+                    {user.company?.name ||
+                      "Independent Developer"}
+                  </strong>
+                </div>
+
+                <Link
+                  to={`/users/${user.id}`}
+                  className="profile-btn"
+                >
+                  View Profile
+                  <span>→</span>
+                </Link>
+              </article>
+            );
+          })}
+        </section>
+      ) : (
+        <div className="empty-directory">
+          <div className="empty-icon">⌕</div>
+
           <h3>No developers found</h3>
-          <p className="muted">Nothing matches “{debounced}”. Try another name or company.</p>
-          <button className="btn btn-ghost" onClick={() => setQuery('')}>Clear search</button>
+
+          <p>
+            Try searching with a different name, username or
+            company.
+          </p>
+
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={() => setSearch("")}
+          >
+            Clear Search
+          </button>
         </div>
       )}
-    </>
+    </div>
   );
-}
+};
+
+export default UserDirectory;

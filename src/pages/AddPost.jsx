@@ -1,153 +1,112 @@
-import { useState } from 'react';
-import AlertBanner from '../components/AlertBanner';
-import useFetch from '../hooks/useFetch';
-import { getErrorMessage } from '../services/api';
-import { createPost, getUsers } from '../services/postService';
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 
-const LIMITS = { title: [5, 80], body: [20, 500] };
-const EMPTY = { userId: '', title: '', body: '' };
+const AddPost = () => {
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-function validate({ userId, title, body }) {
-  const errors = {};
-  if (!userId) errors.userId = 'Please choose an author.';
-  const t = title.trim().length;
-  if (t < LIMITS.title[0]) errors.title = `Title needs at least ${LIMITS.title[0]} characters.`;
-  else if (t > LIMITS.title[1]) errors.title = `Title can have at most ${LIMITS.title[1]} characters.`;
-  const b = body.trim().length;
-  if (b < LIMITS.body[0]) errors.body = `Content needs at least ${LIMITS.body[0]} characters.`;
-  else if (b > LIMITS.body[1]) errors.body = `Content can have at most ${LIMITS.body[1]} characters.`;
-  return errors;
-}
+  const navigate = useNavigate();
 
-export default function AddPost() {
-  const authors = useFetch(getUsers, []);
-  const [form, setForm] = useState(EMPTY);
-  const [touched, setTouched] = useState({});
-  const [submitting, setSubmitting] = useState(false);
-  const [notice, setNotice] = useState(null); // { type, message }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const errors = validate(form);
-  const isValid = Object.keys(errors).length === 0;
+    if (!title.trim() || !body.trim()) {
+      setMessage("Please enter both title and content.");
+      return;
+    }
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleBlur = (e) => setTouched({ ...touched, [e.target.name]: true });
-
-  const submit = async () => {
-    setSubmitting(true);
-    setNotice(null);
     try {
-      const res = await createPost({
-        title: form.title.trim(),
-        body: form.body.trim(),
-        userId: Number(form.userId),
-      });
-      if (res.status === 201) {
-        setNotice({
-          type: 'success',
-          message: `Post published successfully! (id #${res.data.id}, status 201 Created)`,
-        });
-        setForm(EMPTY);
-        setTouched({});
-      } else {
-        setNotice({ type: 'error', message: `Unexpected response status ${res.status}.` });
-      }
-    } catch (err) {
-      setNotice({ type: 'error', message: getErrorMessage(err), retry: true });
+      setLoading(true);
+      setMessage("");
+
+      await axios.post(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          title,
+          body,
+          userId: 1,
+        }
+      );
+
+      setMessage("Post created successfully!");
+
+      setTitle("");
+      setBody("");
+
+      setTimeout(() => {
+        navigate("/users");
+      }, 1200);
+    } catch (error) {
+      setMessage("Unable to create post. Please try again.");
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setTouched({ userId: true, title: true, body: true });
-    if (isValid) submit();
-  };
-
-  const counter = (field) => {
-    const len = form[field].trim().length;
-    const [min, max] = LIMITS[field];
-    const ok = len >= min && len <= max;
-    return <small className={`counter ${ok ? 'ok' : ''}`}>{len} / {max}</small>;
-  };
-
   return (
-    <div className="narrow">
-      <div className="page-head">
-        <div>
-          <h1>Publish a bulletin</h1>
-          <p className="muted">Share documentation or updates with the whole engineering org.</p>
-        </div>
+    <div className="add-post-page">
+      <Link to="/" className="back-link">
+        ← Back to Home
+      </Link>
+
+      <div className="add-post-header">
+        <span className="section-label">COMMUNITY</span>
+
+        <h1>Create a Post</h1>
+
+        <p>
+          Share your ideas, knowledge and thoughts with the
+          developer community.
+        </p>
       </div>
 
-      {notice && (
-        <AlertBanner
-          type={notice.type}
-          message={notice.message}
-          onRetry={notice.retry ? submit : undefined}
-          onDismiss={() => setNotice(null)}
-        />
-      )}
-      {authors.error && <AlertBanner message={authors.error} onRetry={authors.reload} />}
+      <div className="add-post-card">
+        <form onSubmit={handleSubmit} className="post-form">
+          <div className="form-group">
+            <label htmlFor="post-title">Post Title</label>
 
-      <form className="card form-card" onSubmit={handleSubmit} noValidate>
-        <label className="field">
-          <span>Author</span>
-          <select
-            name="userId"
-            value={form.userId}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={authors.loading}
-          >
-            <option value="">
-              {authors.loading ? 'Loading developers…' : 'Select an author'}
-            </option>
-            {authors.data?.map((u) => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
-          {touched.userId && errors.userId && <small className="field-error">{errors.userId}</small>}
-        </label>
+            <input
+              id="post-title"
+              type="text"
+              placeholder="Enter your post title..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
-        <label className="field">
-          <span>Title {counter('title')}</span>
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="e.g. How we cut build times by 40%"
-          />
-          {touched.title && errors.title && <small className="field-error">{errors.title}</small>}
-        </label>
+          <div className="form-group">
+            <label htmlFor="post-body">Content</label>
 
-        <label className="field">
-          <span>Body content {counter('body')}</span>
-          <textarea
-            name="body"
-            rows="7"
-            value={form.body}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Write your update here (20–500 characters)…"
-          />
-          {touched.body && errors.body && <small className="field-error">{errors.body}</small>}
-        </label>
+            <textarea
+              id="post-body"
+              rows="8"
+              placeholder="Write something interesting..."
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+            ></textarea>
+          </div>
 
-        <div className="form-actions">
+          {message && (
+            <div className="post-message">
+              {message}
+            </div>
+          )}
+
           <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => { setForm(EMPTY); setTouched({}); }}
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
           >
-            Reset
+            {loading ? "Publishing..." : "Publish Post"}
+            {!loading && <span>→</span>}
           </button>
-          <button className="btn btn-primary" type="submit" disabled={!isValid || submitting}>
-            {submitting ? 'Publishing…' : '🚀 Publish post'}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default AddPost;

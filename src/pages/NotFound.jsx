@@ -1,12 +1,28 @@
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-export default function NotFound() {
+const NotFound = () => {
   return (
-    <div className="card empty-state notfound">
-      <h1 className="gradient-text">404</h1>
-      <h3>Lost in the codebase</h3>
-      <p className="muted">The page you are looking for doesn't exist or was moved.</p>
-      <Link to="/" className="btn btn-primary">← Back to home</Link>
+    <div className="not-found-page">
+      <div className="not-found-card">
+        <span className="not-found-code">404</span>
+
+        <span className="section-label">PAGE NOT FOUND</span>
+
+        <h1>Looks like you got lost.</h1>
+
+        <p>
+          The page you are looking for does not exist or may have
+          been moved.
+        </p>
+
+        <Link to="/" className="primary-btn">
+          Back to Home
+          <span>→</span>
+        </Link>
+      </div>
     </div>
   );
-}
+};
+
+export default NotFound;

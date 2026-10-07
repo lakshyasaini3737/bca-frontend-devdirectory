@@ -1,66 +1,50 @@
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
 
-export default function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem('dd_theme') || 'dark');
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('dd_theme', theme);
-  }, [theme]);
-
-  const close = () => setOpen(false);
-  const handleLogout = () => {
-    logout();
-    close();
-    navigate('/');
-  };
+const Navbar = () => {
+  const navItems = [
+    { name: "Home", path: "/" },
+    { name: "Developers", path: "/users" },
+    { name: "Create Post", path: "/add-post" },
+  ];
 
   return (
     <header className="navbar">
-      <div className="container nav-inner">
-        <Link to="/" className="brand" onClick={close}>
-          <span className="brand-logo">{'</>'}</span>
-          <span>Dev<b>Directory</b></span>
+      <div className="navbar-container">
+        <Link to="/" className="brand">
+          <div className="brand-icon">DS</div>
+
+          <div className="brand-text">
+            <span className="brand-name">DevSphere</span>
+            <span className="brand-tagline">
+              Developer Community
+            </span>
+          </div>
         </Link>
 
-        <button
-          className="nav-toggle"
-          onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
-          aria-expanded={open}
-        >
-          {open ? '✕' : '☰'}
-        </button>
-
-        <nav className={`nav-links ${open ? 'open' : ''}`}>
-          <NavLink to="/" end onClick={close}>Home</NavLink>
-          <NavLink to="/users" onClick={close}>Developers</NavLink>
-          <NavLink to="/add-post" onClick={close}>Write Post</NavLink>
-
-          <button
-            className="icon-btn"
-            onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-            aria-label="Switch theme"
-            title="Switch theme"
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-
-          {isAuthenticated ? (
-            <div className="nav-user">
-              <span className="chip">👋 {user.name.split(' ')[0]}</span>
-              <button className="btn btn-sm btn-ghost" onClick={handleLogout}>Logout</button>
-            </div>
-          ) : (
-            <Link to="/login" className="btn btn-sm btn-primary" onClick={close}>Login</Link>
-          )}
+        <nav className="nav-links">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              {item.name}
+            </NavLink>
+          ))}
         </nav>
+
+        <div className="navbar-actions">
+          <Link to="/users" className="explore-btn">
+            Explore Developers
+            <span>→</span>
+          </Link>
+        </div>
       </div>
     </header>
   );
-}
+};
+
+export default Navbar;
