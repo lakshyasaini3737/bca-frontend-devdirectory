@@ -1,201 +1,251 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div className="home-page">
+    <main className="home-page">
       <section className="hero-section">
         <div className="hero-content">
-          <div className="badge">✦ Built for Developers</div>
+          <div className="badge">
+            <span className="badge-sparkle">✦</span>
+            Built for Developers
+          </div>
 
           <h1>
-            Discover the
-            <span className="hero-gradient"> Developer </span>
-            Community
+            Where Developers
+            <span className="hero-gradient"> Connect & Create.</span>
           </h1>
 
           <p className="hero-description">
-            DevSphere is a modern developer community where you can
-            discover developers, explore profiles, and connect with
-            people building amazing things with technology.
+            Discover developer profiles, explore technical interests,
+            and find inspiration in a community built for people who
+            love creating with technology.
           </p>
 
           <div className="hero-actions">
             <Link to="/users" className="primary-btn">
-              Explore Developers
-              <span>→</span>
+              Explore Developers <span>↗</span>
             </Link>
 
-            <Link to="/login" className="secondary-btn">
-              Get Started
+            <Link to="/add-post" className="secondary-btn">
+              Create a Post <span>＋</span>
             </Link>
+          </div>
+
+          <div className="hero-trust">
+            <span className="trust-dot" />
+            <span>Explore profiles. Share ideas. Keep building.</span>
           </div>
         </div>
 
         <div className="hero-visual">
+          <div className="hero-orb hero-orb-one" />
+          <div className="hero-orb hero-orb-two" />
+
           <div className="code-window">
             <div className="window-header">
-              <span></span>
-              <span></span>
-              <span></span>
+              <div className="window-dots">
+                <span />
+                <span />
+                <span />
+              </div>
+              <span className="window-title">developer.js</span>
+              <span className="window-status">● Live</span>
             </div>
 
             <div className="code-content">
-              <div>
-                <span className="code-purple">const</span>{" "}
-                <span className="code-blue">developer</span> = {"{"}
-              </div>
-
-              <div className="code-indent">
-                name:{" "}
-                <span className="code-green">
-                  "Creative Developer"
-                </span>
-                ,
-              </div>
-
-              <div className="code-indent">
-                skills: [
-                <span className="code-green">"React"</span>,{" "}
-                <span className="code-green">"JavaScript"</span>],
-              </div>
-
-              <div className="code-indent">
-                passion:{" "}
-                <span className="code-green">
-                  "Building"
+              <div className="code-line">
+                <span className="code-line-number">01</span>
+                <span>
+                  <span className="code-purple">const</span>{" "}
+                  <span className="code-blue">developer</span> = {"{"}
                 </span>
               </div>
 
-              <div>{"}"};</div>
+              <div className="code-line">
+                <span className="code-line-number">02</span>
+                <span className="code-indent">
+                  name: <span className="code-green">"Creator"</span>,
+                </span>
+              </div>
 
-              <br />
+              <div className="code-line">
+                <span className="code-line-number">03</span>
+                <span className="code-indent">
+                  skills: [
+                  <span className="code-green">"React"</span>,{" "}
+                  <span className="code-green">"JS"</span>],
+                </span>
+              </div>
 
-              <div>
-                <span className="code-purple">console</span>.
-                <span className="code-blue">log</span>(
-                <span className="code-green">
+              <div className="code-line">
+                <span className="code-line-number">04</span>
+                <span className="code-indent">
+                  mindset: <span className="code-green">"Keep Learning"</span>,
+                </span>
+              </div>
+
+              <div className="code-line">
+                <span className="code-line-number">05</span>
+                <span>{"};"}</span>
+              </div>
+
+              <div className="code-gap" />
+
+              <div className="code-line">
+                <span className="code-line-number">06</span>
+                <span>
+                  <span className="code-purple">console</span>.
+                  <span className="code-blue">log</span>(
+                </span>
+              </div>
+
+              <div className="code-line">
+                <span className="code-line-number">07</span>
+                <span className="code-indent code-green">
                   "Welcome to DevSphere!"
                 </span>
-                );
+              </div>
+
+              <div className="code-line">
+                <span className="code-line-number">08</span>
+                <span>);</span>
               </div>
             </div>
+
+            <div className="code-window-footer">
+              <span>✦ Build something amazing</span>
+              <span>JavaScript</span>
+            </div>
+          </div>
+
+          <div className="floating-chip chip-top">
+            <span className="chip-icon">✦</span>
+            <span>
+              <strong>Learn</strong>
+              <small>Grow your skills</small>
+            </span>
+          </div>
+
+          <div className="floating-chip chip-bottom">
+            <span className="chip-icon">{"</>"}</span>
+            <span>
+              <strong>Create & Share</strong>
+              <small>Ideas into projects</small>
+            </span>
           </div>
         </div>
       </section>
 
       <section className="stats-section">
-        <div className="stat-card">
-          <div className="stat-icon">👨‍💻</div>
-          <h3>Developers</h3>
-          <p>
-            Discover developers from around the world.
-          </p>
-        </div>
+        <article className="stat-card">
+          <div className="stat-icon">{"</>"}</div>
+          <h3>Discover</h3>
+          <p>Explore developer profiles and technical interests.</p>
+        </article>
 
-        <div className="stat-card">
-          <div className="stat-icon">🚀</div>
-          <h3>Build & Share</h3>
-          <p>
-            Share ideas, projects and technical knowledge.
-          </p>
-        </div>
+        <article className="stat-card">
+          <div className="stat-icon">✧</div>
+          <h3>Create</h3>
+          <p>Share ideas, learning and projects with others.</p>
+        </article>
 
-        <div className="stat-card">
-          <div className="stat-icon">🌐</div>
+        <article className="stat-card">
+          <div className="stat-icon">◎</div>
           <h3>Connect</h3>
-          <p>
-            Explore profiles and connect with the community.
-          </p>
-        </div>
+          <p>Find inspiration from a community of builders.</p>
+        </article>
       </section>
 
       <section className="features-section">
         <div className="section-heading">
-          <span className="section-label">WHY DEVSPHERE</span>
+          <span className="section-label">THE DEVSPHERE EXPERIENCE</span>
 
           <h2>
-            Everything developers need
-            <span className="hero-gradient"> in one place.</span>
+            Your developer journey,
+            <span className="hero-gradient"> all in one place.</span>
           </h2>
 
           <p>
-            A clean and simple platform designed to make
-            discovering developers and their work easier.
+            Discover people, explore profiles and share what you are
+            learning in a modern developer-focused space.
           </p>
         </div>
 
         <div className="feature-grid">
-          <div className="feature-card">
-            <div className="feature-number">01</div>
+          <article className="feature-card">
+            <div className="feature-topline">
+              <span className="feature-number">01</span>
+              <span className="feature-symbol">⌕</span>
+            </div>
 
             <h3>Developer Directory</h3>
 
             <p>
-              Browse developer profiles and discover people with
-              different skills, interests and backgrounds.
+              Browse profiles and discover developers with different
+              interests and technical backgrounds.
             </p>
 
-            <Link to="/users">
-              Explore directory →
-            </Link>
-          </div>
+            <Link to="/users">Explore directory <span>↗</span></Link>
+          </article>
 
-          <div className="feature-card">
-            <div className="feature-number">02</div>
+          <article className="feature-card">
+            <div className="feature-topline">
+              <span className="feature-number">02</span>
+              <span className="feature-symbol">◈</span>
+            </div>
 
             <h3>Developer Profiles</h3>
 
             <p>
-              View detailed profiles and learn more about
-              developers and their technical interests.
+              Explore profile details, contact fields provided by the API,
+              and available developer information.
             </p>
 
-            <Link to="/users">
-              View profiles →
-            </Link>
-          </div>
+            <Link to="/users">View profiles <span>↗</span></Link>
+          </article>
 
-          <div className="feature-card">
-            <div className="feature-number">03</div>
+          <article className="feature-card">
+            <div className="feature-topline">
+              <span className="feature-number">03</span>
+              <span className="feature-symbol">✎</span>
+            </div>
 
             <h3>Community Posts</h3>
 
             <p>
-              Share your thoughts, ideas and technical knowledge
-              with the developer community.
+              Visit the post creation page and explore the community
+              sharing experience.
             </p>
 
-            <Link to="/add-post">
-              Create a post →
-            </Link>
-          </div>
+            <Link to="/add-post">Create a post <span>↗</span></Link>
+          </article>
         </div>
       </section>
 
       <section className="cta-section">
-        <div>
-          <span className="section-label">
-            JOIN THE COMMUNITY
-          </span>
+        <div className="cta-decoration">✦</div>
+
+        <div className="cta-copy">
+          <span className="section-label">YOUR NEXT STEP STARTS HERE</span>
 
           <h2>
-            Start exploring
-            <span className="hero-gradient"> DevSphere.</span>
+            Keep building.
+            <span className="hero-gradient"> Keep connecting.</span>
           </h2>
 
           <p>
-            Discover developers, explore profiles and become
-            part of a growing technology community.
+            Explore DevSphere and discover new ideas for your developer
+            journey.
           </p>
         </div>
 
         <Link to="/users" className="primary-btn">
-          Explore Now
-          <span>→</span>
+          Explore DevSphere <span>↗</span>
         </Link>
       </section>
-    </div>
+    </main>
   );
 };
 

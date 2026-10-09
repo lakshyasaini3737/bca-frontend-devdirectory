@@ -2,7 +2,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./components/context/AuthContext.jsx";
 
 import Home from "./pages/Home";
 import UserDirectory from "./pages/UserDirectory";

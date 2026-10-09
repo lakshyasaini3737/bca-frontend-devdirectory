@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -11,7 +12,7 @@ const Navbar = () => {
   return (
     <header className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="brand">
+        <Link to="/" className="brand" aria-label="DevSphere home">
           <div className="brand-icon">DS</div>
 
           <div className="brand-text">
@@ -22,11 +23,12 @@ const Navbar = () => {
           </div>
         </Link>
 
-        <nav className="nav-links">
+        <nav className="nav-links" aria-label="Main navigation">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.path === "/"}
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
@@ -38,8 +40,7 @@ const Navbar = () => {
 
         <div className="navbar-actions">
           <Link to="/users" className="explore-btn">
-            Explore Developers
-            <span>→</span>
+            Explore Developers <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </div>
