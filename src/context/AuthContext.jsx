@@ -1,3 +1,4 @@
+
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 const AuthContext = createContext(null);
@@ -15,7 +16,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(readStoredUser);
 
   const login = useCallback((userPayload) => {
-    const session = { ...userPayload, token: 'mock-token-' + Date.now() };
+    const session = {
+      ...userPayload,
+      token: 'mock-token-' + Date.now(),
+    };
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     setUser(session);
   }, []);
@@ -30,11 +35,19 @@ export function AuthProvider({ children }) {
     [user, login, logout]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+
+  if (!ctx) {
+    throw new Error('useAuth must be used inside <AuthProvider>');
+  }
+
   return ctx;
 }

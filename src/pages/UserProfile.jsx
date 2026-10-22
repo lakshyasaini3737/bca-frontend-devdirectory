@@ -1,247 +1,342 @@
 
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import {
-  fetchDeveloper,
-  fetchDeveloperPosts,
-} from "../services/api";
+import { Link, useParams } from 'react-router-dom';
+import useFetch from '../hooks/useFetch.js';
+import { getDeveloper } from '../services/developerService.js';
+import { getPostsByUser } from '../services/postService.js';
+import AlertBanner from '../components/AlertBanner.jsx';
+import SkeletonLoader from '../components/SkeletonLoader.jsx';
+
+const englishPosts = [
+  {
+    title: 'Building Better Web Experiences',
+    body: 'A good web application should be easy to use, responsive on different screens, and accessible to all users. Clean code and thoughtful design help create a better experience.',
+  },
+  {
+    title: 'Why Clean Code Matters',
+    body: 'Readable code makes projects easier to understand, test, and maintain. Meaningful names, small functions, and consistent formatting help developers work together effectively.',
+  },
+  {
+    title: 'Getting Started with Modern JavaScript',
+    body: 'JavaScript helps developers build interactive websites. Learning functions, arrays, objects, modules, and asynchronous programming creates a strong foundation for frontend development.',
+  },
+  {
+    title: 'Responsive Design Fundamentals',
+    body: 'Responsive layouts adapt to mobile phones, tablets, and desktops. Flexible grids, suitable spacing, and media queries help keep a website useful on different screen sizes.',
+  },
+  {
+    title: 'Learning React Step by Step',
+    body: 'React applications are built from reusable components. Understanding props, state, event handling, and hooks makes it easier to create interactive user interfaces.',
+  },
+  {
+    title: 'Working Together as a Developer',
+    body: 'Clear communication, useful documentation, code reviews, and version control help teams build reliable software and solve problems together.',
+  },
+];
 
 export default function UserProfile() {
   const { id } = useParams();
 
-  const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const dev = useFetch(() => getDeveloper(id), [id]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const posts = useFetch(
+    () =>
+      dev.data
+        ? getPostsByUser(dev.data.jpUserId)
+        : Promise.resolve([]),
+    [dev.data?.id]
+  );
 
-    async function loadProfile() {
-      setLoading(true);
-      setError("");
-
-      try {
-        const [developer, developerPosts] = await Promise.all([
-          fetchDeveloper(id),
-          fetchDeveloperPosts(id),
-        ]);
-
-        if (cancelled) return;
-
-        if (!developer) {
-          setError(
-            "This profile was not found. Please return to the developer directory."
-          );
-          setUser(null);
-          setPosts([]);
-          return;
-        }
-
-        setUser(developer);
-        setPosts(developerPosts);
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err?.message ||
-              "Unable to load this profile. Please check your internet connection."
-          );
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    loadProfile();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  if (loading) {
+  if (dev.loading) {
     return (
-      <main className="directory-state">
-        <div className="directory-loader" />
-        <h2>Loading Developer Profile...</h2>
-        <p>Fetching profile and contact details from the API.</p>
+      <main className="profile-page">
+        <div className="profile-loading-heading">
+          <span className="profile-eyebrow">DEVSPHERE COMMUNITY</span>
+          <h1>Loading developer profile...</h1>
+        </div>
+        <SkeletonLoader count={1} />
       </main>
     );
   }
 
-  if (error || !user) {
+  if (dev.error || !dev.data) {
     return (
-      <main className="directory-state error-state">
-        <h2>Profile Unavailable</h2>
-        <p>{error || "This developer profile could not be found."}</p>
-        <Link to="/users" className="primary-btn">
-          Back to Developers
-        </Link>
+      <main className="profile-page">
+        <section className="profile-message-card">
+          <span className="profile-eyebrow">PROFILE UNAVAILABLE</span>
+          <AlertBanner
+            message={dev.error || 'Developer profile not found.'}
+            onRetry={dev.retry}
+          />
+          <Link to="/users" className="btn btn-primary">
+            <span aria-hidden="true">←</span> Back to developers
+          </Link>
+        </section>
       </main>
     );
   }
 
-  const address = user.address || {};
+  const d = dev.data;
+  const address = d.address || {};
+  const skills = Array.isArray(d.skills) ? d.skills : [];
+  const name = d.name || d.username || 'DevSphere Developer';
+
+  const initials = name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const publications = englishPosts.map((post, index) => ({
+    ...post,
+    id: index + 1,
+  }));
+
+  const location = [
+    address.city || d.city,
+    address.state,
+    address.country || 'India',
+  ].filter(Boolean).join(', ');
 
   return (
     <main className="profile-page">
-      <Link to="/users" className="profile-back-link">
-        ← Back to Developers
-      </Link>
+      <nav className="profile-breadcrumb" aria-label="Breadcrumb">
+        <Link to="/users">
+          <span aria-hidden="true">←</span> All Developers
+        </Link>
+        <span aria-hidden="true">/</span>
+        <span>{name}</span>
+      </nav>
 
       <section className="profile-hero">
-        <div className="profile-hero-content">
-          <div className="profile-avatar">
-            {user.photo ? (
+        <div className="profile-hero-glow" aria-hidden="true" />
+
+        <div className="profile-identity">
+          <div className="profile-photo profile-avatar-premium">
+            {d.photo ? (
               <img
-                src={user.photo}
-                alt={user.name}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "inherit",
+                src={d.photo}
+                alt={`${name} profile`}
+                width="120"
+                height="120"
+                onError={(event) => {
+                  event.currentTarget.style.display = 'none';
                 }}
               />
             ) : (
-              (user.name || "D")
-                .split(" ")
-                .map((part) => part[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase()
+              <div className="profile-initials">
+                {initials || 'DS'}
+              </div>
             )}
           </div>
 
-          <div className="profile-main-info">
-            <span className="section-label">DEVSPHERE MEMBER</span>
-            <h1>{user.name}</h1>
-            <p>@{user.username}</p>
-            <span className="profile-role-badge">
-              {user.role || "Software Developer"}
+          <div className="profile-identity-copy">
+            <span className="profile-eyebrow">
+              <span aria-hidden="true">✦</span> DEVSPHERE MEMBER
             </span>
-          </div>
-        </div>
-      </section>
 
-      <section className="profile-grid">
-        <article className="profile-info-card">
-          <h2 className="profile-card-heading">
-            Contact Information
-          </h2>
+            <h1>{name}</h1>
 
-          <div className="profile-detail">
-            <span className="section-label">EMAIL ADDRESS</span>
-            <a href={`mailto:${user.email}`}>{user.email || "Not provided"}</a>
-          </div>
+            <p className="profile-role">
+              {d.role || 'Developer'}
+              {d.company ? ` at ${d.company}` : ''}
+            </p>
 
-          <div className="profile-detail">
-            <span className="section-label">PHONE NUMBER</span>
-            {user.phone ? (
-              <a href={`tel:${user.phone}`}>{user.phone}</a>
-            ) : (
-              <span>Not provided by API</span>
-            )}
-          </div>
+            <p className="profile-location">
+              <span aria-hidden="true">⌖</span>
+              {location || 'Location not provided'}
+            </p>
 
-          {user.website && (
-            <div className="profile-detail">
-              <span className="section-label">WEBSITE</span>
-              <a
-                href={
-                  user.website.startsWith("http")
-                    ? user.website
-                    : `https://${user.website}`
-                }
-                target="_blank"
-                rel="noreferrer"
-              >
-                {user.website}
-              </a>
+            <div className="profile-status-row">
+              <span className={`profile-availability ${d.available ? 'is-available' : 'is-busy'}`}>
+                <span className="online-dot" />
+                {d.available ? 'Available for opportunities' : 'Currently busy'}
+              </span>
             </div>
-          )}
-        </article>
-
-        <article className="profile-info-card">
-          <h2 className="profile-card-heading">Location Details</h2>
-
-          <div className="profile-detail">
-            <span className="section-label">COUNTRY</span>
-            <span>{address.country || "India"}</span>
           </div>
-
-          <div className="profile-detail">
-            <span className="section-label">CITY</span>
-            <span>{address.city || "Not provided"}</span>
-          </div>
-
-          <div className="profile-detail">
-            <span className="section-label">STREET ADDRESS</span>
-            <span>{address.street || "Not provided"}</span>
-          </div>
-
-          <div className="profile-detail">
-            <span className="section-label">PIN CODE</span>
-            <span>{address.zipcode || "Not provided by API"}</span>
-          </div>
-        </article>
-
-        <article className="profile-info-card">
-          <h2 className="profile-card-heading">
-            Professional Details
-          </h2>
-
-          <div className="profile-detail">
-            <span className="section-label">ORGANIZATION</span>
-            <span>{user.company?.name || "Not provided"}</span>
-          </div>
-
-          <div className="profile-detail">
-            <span className="section-label">PROFESSIONAL ROLE</span>
-            <span>{user.role || "Software Developer"}</span>
-          </div>
-
-          <div className="profile-detail">
-            <span className="section-label">AREA OF EXPERTISE</span>
-            <span>{user.focus || "Web Development"}</span>
-          </div>
-        </article>
-      </section>
-
-      <section className="profile-posts">
-        <div className="section-heading">
-          <span className="section-label">COMMUNITY ACTIVITY</span>
-          <h2>Latest Posts</h2>
-          <p>Posts loaded from the posts API.</p>
         </div>
 
-        {posts.length > 0 ? (
-          <div className="posts-list">
-            {posts.slice(0, 6).map((post, index) => (
-              <article className="profile-post-card" key={post.id}>
-                <span className="post-number">
-                  #{String(index + 1).padStart(2, "0")}
-                </span>
-
-                <h3>{post.title}</h3>
-                <p>{post.body}</p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="profile-info-card">
-            No posts are available for this profile yet.
-          </div>
-        )}
+        <div className="profile-hero-footer">
+          <a
+            href={d.email ? `mailto:${d.email}` : undefined}
+            className={`profile-contact-button ${d.email ? '' : 'is-disabled'}`}
+            aria-disabled={!d.email}
+            onClick={!d.email ? (event) => event.preventDefault() : undefined}
+          >
+            Contact Developer <span aria-hidden="true">↗</span>
+          </a>
+          <span className="profile-member-mark">DS <span aria-hidden="true">✦</span></span>
+        </div>
       </section>
 
-      <section className="profile-cta">
-        <h2>Explore the DevSphere Community</h2>
-        <p>Discover more profiles and explore the developer directory.</p>
-        <Link to="/users" className="primary-btn">
-          Explore Developers →
-        </Link>
+      <section className="profile-stats-grid" aria-label="Developer statistics">
+        <article className="profile-stat-card">
+          <span className="profile-stat-icon" aria-hidden="true">$</span>
+          <div>
+            <strong>
+              {d.rate != null ? `$${d.rate}` : '—'}
+              <span className="profile-stat-unit">/hr</span>
+            </strong>
+            <span>Hourly Rate</span>
+          </div>
+        </article>
+
+        <article className="profile-stat-card">
+          <span className="profile-stat-icon" aria-hidden="true">↗</span>
+          <div>
+            <strong>{d.exp != null ? d.exp : '—'}</strong>
+            <span>Years of Experience</span>
+          </div>
+        </article>
+
+        <article className="profile-stat-card">
+          <span className="profile-stat-icon" aria-hidden="true">⌘</span>
+          <div>
+            <strong>{skills.length}</strong>
+            <span>Listed Skills</span>
+          </div>
+        </article>
       </section>
+
+      <div className="profile-content-grid">
+        <div className="profile-main-column">
+          <section className="profile-panel">
+            <div className="profile-section-heading">
+              <div>
+                <span className="profile-eyebrow">TECHNICAL EXPERTISE</span>
+                <h2>Skills & Technologies</h2>
+              </div>
+              <span className="profile-section-count">
+                {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
+              </span>
+            </div>
+
+            {skills.length > 0 ? (
+              <div className="chips profile-skill-chips">
+                {skills.map((skill) => (
+                  <span key={skill} className="chip">{skill}</span>
+                ))}
+              </div>
+            ) : (
+              <p className="profile-muted-copy">
+                No skills have been added to this profile yet.
+              </p>
+            )}
+          </section>
+
+          <section className="profile-posts-section">
+            <div className="profile-section-heading">
+              <div>
+                <span className="profile-eyebrow">IDEAS & KNOWLEDGE</span>
+                <h2>Latest Posts</h2>
+                <p className="profile-muted-copy">
+                  Developer community articles and learning notes.
+                </p>
+              </div>
+              <span className="profile-section-count">06 articles</span>
+            </div>
+
+            {posts.error && (
+              <AlertBanner message={posts.error} onRetry={posts.retry} />
+            )}
+
+            {posts.loading ? (
+              <SkeletonLoader count={3} />
+            ) : (
+              <div className="profile-post-grid">
+                {publications.map((post, index) => (
+                  <article className="profile-post-card" key={post.id}>
+                    <div className="profile-post-topline">
+                      <span className="profile-post-number">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="profile-post-symbol" aria-hidden="true">↗</span>
+                    </div>
+
+                    <h3>{post.title}</h3>
+                    <p>{post.body}</p>
+
+                    <div className="profile-post-footer">
+                      <span>Developer Insights</span>
+                      <span aria-hidden="true">✦</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        <aside className="profile-sidebar">
+          <section className="profile-panel profile-contact-panel">
+            <span className="profile-eyebrow">GET IN TOUCH</span>
+            <h2>Contact Information</h2>
+            <p className="profile-muted-copy">
+              Connect with this developer to discuss ideas and opportunities.
+            </p>
+
+            <div className="profile-contact-list">
+              <div className="profile-contact-item">
+                <span className="profile-contact-icon" aria-hidden="true">@</span>
+                <div>
+                  <span>Email Address</span>
+                  {d.email ? (
+                    <a href={`mailto:${d.email}`}>{d.email}</a>
+                  ) : (
+                    <strong>Not provided</strong>
+                  )}
+                </div>
+              </div>
+
+              <div className="profile-contact-item">
+                <span className="profile-contact-icon" aria-hidden="true">☎</span>
+                <div>
+                  <span>Phone Number</span>
+                  {d.phone ? (
+                    <a href={`tel:${d.phone}`}>{d.phone}</a>
+                  ) : (
+                    <strong>Not provided</strong>
+                  )}
+                </div>
+              </div>
+
+              <div className="profile-contact-item">
+                <span className="profile-contact-icon" aria-hidden="true">⌖</span>
+                <div>
+                  <span>Location</span>
+                  <strong>{location || 'Not provided'}</strong>
+                </div>
+              </div>
+
+              {address.postalCode && (
+                <div className="profile-contact-item">
+                  <span className="profile-contact-icon" aria-hidden="true">#</span>
+                  <div>
+                    <span>PIN Code</span>
+                    <strong>{address.postalCode}</strong>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="profile-opportunity-card">
+            <span className="profile-opportunity-icon" aria-hidden="true">✦</span>
+            <h2>Have a project in mind?</h2>
+            <p>
+              Explore projects and find opportunities to collaborate with the DevSphere community.
+            </p>
+            <Link to="/projects" className="profile-opportunity-link">
+              Explore Projects <span aria-hidden="true">↗</span>
+            </Link>
+          </section>
+        </aside>
+      </div>
+
+      <div className="profile-bottom-link">
+        <Link to="/users">← Back to all developers</Link>
+      </div>
     </main>
   );
 }

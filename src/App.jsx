@@ -1,98 +1,36 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./components/context/AuthContext.jsx";
-
-import Home from "./pages/Home";
-import UserDirectory from "./pages/UserDirectory";
-import UserProfile from "./pages/UserProfile";
-import AddPost from "./pages/AddPost";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
-
-function GuestOnly({ children }) {
-  const { isAuthenticated } = useAuth();
-  const location = useLocation();
-
-  if (isAuthenticated) {
-    return (
-      <Navigate
-        to={location.state?.from?.pathname || "/"}
-        replace
-      />
-    );
-  }
-
-  return children;
-}
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import Home from './pages/Home.jsx';
+import UserDirectory from './pages/UserDirectory.jsx';
+import UserProfile from './pages/UserProfile.jsx';
+import Projects from './pages/Projects.jsx';
+import ProjectDetail from './pages/ProjectDetail.jsx';
+import NewProject from './pages/NewProject.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import AddPost from './pages/AddPost.jsx';
+import Login from './pages/Login.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 export default function App() {
   return (
-    <div className="app-shell">
-      <div className="bg-grid"></div>
-      <div className="bg-glow glow-one"></div>
-      <div className="bg-glow glow-two"></div>
-
+    <>
       <Navbar />
-
-      <main className="container page">
+      <main className="container">
         <Routes>
           <Route path="/" element={<Home />} />
-
           <Route path="/users" element={<UserDirectory />} />
-
-          <Route
-            path="/users/:id"
-            element={<UserProfile />}
-          />
-
-          <Route
-            path="/login"
-            element={
-              <GuestOnly>
-                <Login />
-              </GuestOnly>
-            }
-          />
-
-          <Route
-            path="/add-post"
-            element={
-              <ProtectedRoute>
-                <AddPost />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
+          <Route path="/users/:id" element={<UserProfile />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/projects/new" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/add-post" element={<ProtectedRoute><AddPost /></ProtectedRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-
-      <footer className="footer">
-        <div className="container footer-content">
-          <div>
-            <div className="footer-brand">
-              <span className="footer-logo">DS</span>
-              <span>DevSphere</span>
-            </div>
-
-            <p>
-              A modern developer community built with React.
-            </p>
-          </div>
-
-          <div className="footer-right">
-            <span>React</span>
-            <span>React Router</span>
-            <span>Axios</span>
-            <span>JSONPlaceholder API</span>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <footer className="footer">DevSphere · Built with React, Vite &amp; Axios</footer>
+    </>
   );
 }

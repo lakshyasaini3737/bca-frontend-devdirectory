@@ -1,252 +1,218 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { DEVELOPERS } from '../data/developers.js';
+import { money, useProjects } from '../context/ProjectsContext.jsx';
+import UserCard from '../components/UserCard.jsx';
+import ProjectCard from '../components/ProjectCard.jsx';
 
-const Home = () => {
+export default function Home() {
+  const { projects } = useProjects();
+
+  const openProjects = projects.filter((project) => project.status === 'open');
+  const availableDevelopers = DEVELOPERS.filter((developer) => developer.available);
+  const totalBudget = projects.reduce(
+    (sum, project) => sum + Number(project.budget || 0),
+    0
+  );
+
   return (
     <main className="home-page">
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="badge">
-            <span className="badge-sparkle">✦</span>
-            Built for Developers
-          </div>
+      {/* Hero */}
+      <section className="home-hero">
+        <div className="home-hero-glow home-hero-glow-one" aria-hidden="true" />
+        <div className="home-hero-glow home-hero-glow-two" aria-hidden="true" />
+
+        <div className="home-hero-content">
+          <span className="home-eyebrow">
+            <span className="home-eyebrow-dot" />
+            YOUR NEXT COLLABORATION STARTS HERE
+          </span>
 
           <h1>
-            Where Developers
-            <span className="hero-gradient"> Connect & Create.</span>
+            Great developers.
+            <br />
+            <span className="home-gradient-text">Ambitious projects.</span>
+            <br />
+            Real possibilities.
           </h1>
 
-          <p className="hero-description">
-            Discover developer profiles, explore technical interests,
-            and find inspiration in a community built for people who
-            love creating with technology.
+          <p className="home-hero-description">
+            Discover talented developers, find exciting projects, and turn
+            your ideas into something meaningful — together.
           </p>
 
-          <div className="hero-actions">
-            <Link to="/users" className="primary-btn">
-              Explore Developers <span>↗</span>
+          <div className="home-hero-actions">
+            <Link to="/projects" className="btn btn-primary home-primary-cta">
+              Explore projects <span aria-hidden="true">↗</span>
             </Link>
 
-            <Link to="/add-post" className="secondary-btn">
-              Create a Post <span>＋</span>
+            <Link to="/users" className="btn home-secondary-cta">
+              Meet developers <span aria-hidden="true">→</span>
             </Link>
           </div>
 
-          <div className="hero-trust">
-            <span className="trust-dot" />
-            <span>Explore profiles. Share ideas. Keep building.</span>
+          <div className="home-trust-line">
+            <span className="home-trust-mark" aria-hidden="true">✓</span>
+            <span>Discover talent. Build together. Grow your portfolio.</span>
           </div>
         </div>
 
-        <div className="hero-visual">
-          <div className="hero-orb hero-orb-one" />
-          <div className="hero-orb hero-orb-two" />
+        <div className="home-hero-visual" aria-hidden="true">
+          <div className="home-visual-orbit home-orbit-one" />
+          <div className="home-visual-orbit home-orbit-two" />
 
-          <div className="code-window">
-            <div className="window-header">
-              <div className="window-dots">
+          <div className="home-code-window">
+            <div className="home-window-bar">
+              <div className="home-window-dots">
                 <span />
                 <span />
                 <span />
               </div>
-              <span className="window-title">developer.js</span>
-              <span className="window-status">● Live</span>
+              <span className="home-window-label">devsphere.jsx</span>
             </div>
 
-            <div className="code-content">
-              <div className="code-line">
-                <span className="code-line-number">01</span>
-                <span>
-                  <span className="code-purple">const</span>{" "}
-                  <span className="code-blue">developer</span> = {"{"}
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">02</span>
-                <span className="code-indent">
-                  name: <span className="code-green">"Creator"</span>,
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">03</span>
-                <span className="code-indent">
-                  skills: [
-                  <span className="code-green">"React"</span>,{" "}
-                  <span className="code-green">"JS"</span>],
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">04</span>
-                <span className="code-indent">
-                  mindset: <span className="code-green">"Keep Learning"</span>,
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">05</span>
-                <span>{"};"}</span>
-              </div>
-
-              <div className="code-gap" />
-
-              <div className="code-line">
-                <span className="code-line-number">06</span>
-                <span>
-                  <span className="code-purple">console</span>.
-                  <span className="code-blue">log</span>(
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">07</span>
-                <span className="code-indent code-green">
-                  "Welcome to DevSphere!"
-                </span>
-              </div>
-
-              <div className="code-line">
-                <span className="code-line-number">08</span>
-                <span>);</span>
-              </div>
+            <div className="home-code-content">
+              <div><span className="home-code-muted">01</span> <span className="home-code-purple">const</span> <span className="home-code-blue">ideas</span> = <span className="home-code-green">"big"</span>;</div>
+              <div><span className="home-code-muted">02</span> </div>
+              <div><span className="home-code-muted">03</span> <span className="home-code-purple">const</span> <span className="home-code-blue">team</span> = <span className="home-code-green">"great"</span>;</div>
+              <div><span className="home-code-muted">04</span> </div>
+              <div><span className="home-code-muted">05</span> <span className="home-code-purple">function</span> <span className="home-code-yellow">buildSomething</span>() {'{'}</div>
+              <div><span className="home-code-muted">06</span> &nbsp; <span className="home-code-purple">return</span> <span className="home-code-blue">ideas</span> + <span className="home-code-blue">team</span>;</div>
+              <div><span className="home-code-muted">07</span> {'}'}</div>
+              <div><span className="home-code-muted">08</span> </div>
+              <div><span className="home-code-muted">09</span> <span className="home-code-green">{"// Let's build together."}</span></div>
             </div>
 
-            <div className="code-window-footer">
-              <span>✦ Build something amazing</span>
-              <span>JavaScript</span>
+            <div className="home-code-status">
+              <span><span className="home-status-dot" /> Ready to build</span>
+              <span>DevSphere</span>
             </div>
           </div>
 
-          <div className="floating-chip chip-top">
-            <span className="chip-icon">✦</span>
+          <div className="home-float-card home-float-top">
+            <span className="home-float-icon home-float-icon-blue">⌘</span>
             <span>
-              <strong>Learn</strong>
-              <small>Grow your skills</small>
+              <strong>Find your team</strong>
+              <small>Skills that fit your vision</small>
             </span>
           </div>
 
-          <div className="floating-chip chip-bottom">
-            <span className="chip-icon">{"</>"}</span>
+          <div className="home-float-card home-float-bottom">
+            <span className="home-float-icon home-float-icon-green">↗</span>
             <span>
-              <strong>Create & Share</strong>
-              <small>Ideas into projects</small>
+              <strong>Make it happen</strong>
+              <small>Turn plans into projects</small>
             </span>
           </div>
         </div>
       </section>
 
-      <section className="stats-section">
-        <article className="stat-card">
-          <div className="stat-icon">{"</>"}</div>
-          <h3>Discover</h3>
-          <p>Explore developer profiles and technical interests.</p>
-        </article>
-
-        <article className="stat-card">
-          <div className="stat-icon">✧</div>
-          <h3>Create</h3>
-          <p>Share ideas, learning and projects with others.</p>
-        </article>
-
-        <article className="stat-card">
-          <div className="stat-icon">◎</div>
-          <h3>Connect</h3>
-          <p>Find inspiration from a community of builders.</p>
-        </article>
-      </section>
-
-      <section className="features-section">
-        <div className="section-heading">
-          <span className="section-label">THE DEVSPHERE EXPERIENCE</span>
-
-          <h2>
-            Your developer journey,
-            <span className="hero-gradient"> all in one place.</span>
-          </h2>
-
-          <p>
-            Discover people, explore profiles and share what you are
-            learning in a modern developer-focused space.
-          </p>
+      {/* Live project and developer statistics */}
+      <section className="home-stats" aria-label="DevSphere statistics">
+        <div className="home-stat-card">
+          <span className="home-stat-icon">◉</span>
+          <div>
+            <strong>{DEVELOPERS.length}</strong>
+            <span>Developers</span>
+          </div>
+          <span className="home-stat-note">Talent network</span>
         </div>
 
-        <div className="feature-grid">
-          <article className="feature-card">
-            <div className="feature-topline">
-              <span className="feature-number">01</span>
-              <span className="feature-symbol">⌕</span>
-            </div>
+        <div className="home-stat-card">
+          <span className="home-stat-icon home-stat-icon-green">↗</span>
+          <div>
+            <strong>{openProjects.length}</strong>
+            <span>Open projects</span>
+          </div>
+          <span className="home-stat-note">Ready to explore</span>
+        </div>
 
-            <h3>Developer Directory</h3>
-
-            <p>
-              Browse profiles and discover developers with different
-              interests and technical backgrounds.
-            </p>
-
-            <Link to="/users">Explore directory <span>↗</span></Link>
-          </article>
-
-          <article className="feature-card">
-            <div className="feature-topline">
-              <span className="feature-number">02</span>
-              <span className="feature-symbol">◈</span>
-            </div>
-
-            <h3>Developer Profiles</h3>
-
-            <p>
-              Explore profile details, contact fields provided by the API,
-              and available developer information.
-            </p>
-
-            <Link to="/users">View profiles <span>↗</span></Link>
-          </article>
-
-          <article className="feature-card">
-            <div className="feature-topline">
-              <span className="feature-number">03</span>
-              <span className="feature-symbol">✎</span>
-            </div>
-
-            <h3>Community Posts</h3>
-
-            <p>
-              Visit the post creation page and explore the community
-              sharing experience.
-            </p>
-
-            <Link to="/add-post">Create a post <span>↗</span></Link>
-          </article>
+        <div className="home-stat-card">
+          <span className="home-stat-icon home-stat-icon-purple">◇</span>
+          <div>
+            <strong>{money(totalBudget)}</strong>
+            <span>Total project budgets</span>
+          </div>
+          <span className="home-stat-note">Across all projects</span>
         </div>
       </section>
 
-      <section className="cta-section">
-        <div className="cta-decoration">✦</div>
+      {/* Open projects */}
+      <section className="home-section">
+        <div className="home-section-heading">
+          <div>
+            <span className="home-section-kicker">OPPORTUNITIES</span>
+            <h2>Projects worth building</h2>
+            <p>Find your next challenge and put your skills to work.</p>
+          </div>
 
-        <div className="cta-copy">
-          <span className="section-label">YOUR NEXT STEP STARTS HERE</span>
-
-          <h2>
-            Keep building.
-            <span className="hero-gradient"> Keep connecting.</span>
-          </h2>
-
-          <p>
-            Explore DevSphere and discover new ideas for your developer
-            journey.
-          </p>
+          <Link to="/projects" className="home-view-all">
+            View all projects <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
-        <Link to="/users" className="primary-btn">
-          Explore DevSphere <span>↗</span>
+        {openProjects.length > 0 ? (
+          <div className="grid home-project-grid">
+            {openProjects.slice(0, 3).map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="home-empty-state">
+            <span className="home-empty-icon">◇</span>
+            <h3>No open projects right now</h3>
+            <p>Explore the developer community while new opportunities are added.</p>
+            <Link to="/users" className="btn btn-primary">
+              Explore developers
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* Featured developers */}
+      <section className="home-section home-developers-section">
+        <div className="home-section-heading">
+          <div>
+            <span className="home-section-kicker">THE COMMUNITY</span>
+            <h2>Meet your future teammates</h2>
+            <p>Connect with available developers and create something great.</p>
+          </div>
+
+          <Link to="/users" className="home-view-all">
+            Meet everyone <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+
+        {availableDevelopers.length > 0 ? (
+          <div className="grid home-developer-grid">
+            {availableDevelopers.slice(0, 6).map((developer) => (
+              <UserCard key={developer.id} dev={developer} />
+            ))}
+          </div>
+        ) : (
+          <div className="home-empty-state">
+            <span className="home-empty-icon">◎</span>
+            <h3>More connections are on the way</h3>
+            <p>Visit the directory to explore the developer community.</p>
+            <Link to="/users" className="btn">
+              Browse directory
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* Final call to action */}
+      <section className="home-bottom-cta">
+        <div className="home-cta-decoration" aria-hidden="true">✳</div>
+        <div>
+          <span className="home-section-kicker">YOUR NEXT CHAPTER</span>
+          <h2>Have an idea? Find your people.</h2>
+          <p>Explore projects, connect with developers, and take the next step.</p>
+        </div>
+        <Link to="/projects" className="btn btn-primary home-primary-cta">
+          Start exploring <span aria-hidden="true">↗</span>
         </Link>
       </section>
     </main>
   );
-};
-
-export default Home;
+}
